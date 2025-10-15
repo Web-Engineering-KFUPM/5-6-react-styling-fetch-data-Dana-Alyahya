@@ -321,19 +321,74 @@ import { Container, Alert, Spinner } from 'react-bootstrap'
 import UserList from './components/UserList'
 import SearchBar from './components/SearchBar'
 import UserModal from './components/UserModal'
+import { useState, useEffect } from 'react';
+
+const [users, setUsers] = useState([]);
+const [filteredUsers, setFilteredUsers] = useState([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState(null);
+const [searchTerm, setSearchTerm] = useState('');
+const [showModal, setShowModal] = useState(false);
+const [selectedUser, setSelectedUser] = useState(null);
+
 
 function App() {
   const [users, setUsers] = useState([])
 
   useEffect(() => {
-    {/*API fetch logic*/}
+      const fetchUsers = async () => {
+          setLoading(true); // a) start loading spinner
+
+          try {
+              // b) fetch data from API
+              const response = await fetch("https://jsonplaceholder.typicode.com/users");
+
+              // c) convert response to JSON
+              const data = await response.json();
+
+              // d) store data in state
+              setUsers(data);
+              setFilteredUsers(data);
+          } catch (err) {
+              // e) handle errors
+              setError(err.message);
+          } finally {
+              // f) stop spinner
+              setLoading(false);
+          }
+      };
+      fetchUsers();
 
   }, [])
+    //3.4
+
+    useEffect(() => {
+        if (searchTerm.trim() === "") {
+            // a) Show all users when search is empty
+            setFilteredUsers(users);
+        } else {
+            // b) Filter users whose name includes the search term
+            const filtered = users.filter((user) =>
+                user.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredUsers(filtered);
+        }
+    }, [searchTerm, users]);
 
   const handleUserClick = (user) => {
+      setSelectedUser(user);
+
+      setShowModal(true);
+
   }
 
+
   const handleCloseModal = () => {
+      // a) Hide the modal
+      setShowModal(false);
+
+      // b) Reset selected user
+      setSelectedUser(null);
   }
 
   return (
@@ -351,8 +406,25 @@ function App() {
         {/* {loading && <Spinner ... />} */}
         {/* {error && <Alert ...>{error}</Alert>} */}
         {/* <UserList users={filteredUsers} onUserClick={handleUserClick} /> */}
+          {loading && (
+              <div className="text-center my-5">
+                  <Spinner animation="border" variant="primary" />
+                  <p className="mt-3">Loading users...</p>
+              </div>
+          )}
+
+          {error && <Alert variant="danger">Error: {error}</Alert>}
+
+          {!loading && !error && (
+              <UserList users={filteredUsers} onUserClick={handleUserClick} />
+          )}
 
         <UserModal />
+          <UserModal
+              show={showModal}
+              user={selectedUser}
+              onHide={handleCloseModal}
+          />
       </Container>
 
       <footer className="bg-light py-4 mt-5">
