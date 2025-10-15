@@ -11,13 +11,15 @@ function UserCard({ user, onUserClick }) {
           </div>
         </div>
 
-        <Card.Title>{user.name}</Card.Title>
         <Card.Text>
           <strong>Username:</strong> {user.username}<br />
           <strong>Email:</strong> {user.email}<br />
           <strong>Phone:</strong> {user.phone}
         </Card.Text>
       {/* Buttotn*/}
+          <Button variant="primary" onClick={() => onUserClick(user)}>
+              View Details
+          </Button>
       
       </Card.Body>
     </Card>
