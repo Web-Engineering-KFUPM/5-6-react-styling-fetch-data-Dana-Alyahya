@@ -321,19 +321,20 @@ import { Container, Alert, Spinner } from 'react-bootstrap'
 import UserList from './components/UserList'
 import SearchBar from './components/SearchBar'
 import UserModal from './components/UserModal'
-import { useState, useEffect } from 'react';
 
-const [users, setUsers] = useState([]);
-const [filteredUsers, setFilteredUsers] = useState([]);
-const [loading, setLoading] = useState(true);
-const [error, setError] = useState(null);
-const [searchTerm, setSearchTerm] = useState('');
-const [showModal, setShowModal] = useState(false);
-const [selectedUser, setSelectedUser] = useState(null);
+
+
 
 
 function App() {
-  const [users, setUsers] = useState([])
+
+    const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showModal, setShowModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
       const fetchUsers = async () => {
@@ -364,18 +365,20 @@ function App() {
 
     useEffect(() => {
         if (searchTerm.trim() === "") {
-            // a) Show all users when search is empty
             setFilteredUsers(users);
         } else {
-            // b) Filter users whose name includes the search term
-            const filtered = users.filter((user) =>
-                user.name.toLowerCase().includes(searchTerm.toLowerCase())
+            const term = searchTerm.toLowerCase();
+            const filtered = users.filter(
+                (user) =>
+                    user.name.toLowerCase().includes(term) ||
+                    user.username.toLowerCase().includes(term)
             );
             setFilteredUsers(filtered);
         }
     }, [searchTerm, users]);
 
-  const handleUserClick = (user) => {
+
+    const handleUserClick = (user) => {
       setSelectedUser(user);
 
       setShowModal(true);
@@ -401,7 +404,7 @@ function App() {
       </header>
 
       <Container className="py-4">
-        <SearchBar />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
         {/* {loading && <Spinner ... />} */}
         {/* {error && <Alert ...>{error}</Alert>} */}
